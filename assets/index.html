@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" data-theme="dark">
+<html lang="en" data-theme="dark" data-bottom-padding="__BOTTOM_PADDING__">
 
 <head>
     <meta charset="utf-8" />
@@ -839,6 +839,8 @@
         import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
         import markdownItGithubAlerts from 'https://unpkg.com/markdown-it-github-alerts@1.0.1/dist/index.mjs';
 
+        const BOTTOM_PADDING = parseFloat(document.documentElement.dataset.bottomPadding) || 0.5;
+
         // ── DOM refs ──────────────────────────────────────────────────
         const $ = (id) => document.getElementById(id);
         const contentEl = $('content');
@@ -1176,6 +1178,7 @@
                 } else {
                     contentEl.innerHTML = html;
                 }
+                applyBottomPadding();
 
                 const blocks = contentEl.querySelectorAll('.mermaid-block[data-mermaid-source]:not(.mermaid-rendered)');
                 for (const block of blocks) {
@@ -1405,6 +1408,12 @@
                 scrollToSourceLine(lastScrollData.line, lastScrollData.total || 1);
             }
         }).observe(contentEl);
+
+        // ── Bottom padding ────────────────────────────────────────────
+        function applyBottomPadding() {
+            contentEl.style.paddingBottom = `${(1 - BOTTOM_PADDING) * window.innerHeight}px`;
+        }
+        window.addEventListener('resize', applyBottomPadding);
 
         // ── Boot ──────────────────────────────────────────────────────
         (async function boot() {

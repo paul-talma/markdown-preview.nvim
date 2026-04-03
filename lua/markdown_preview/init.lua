@@ -31,10 +31,15 @@ M.config = {
 	mermaid_renderer = "js",
 
 	scroll_sync = true, -- sync browser scroll to cursor position
+
+	-- Fraction (0–1): vertical position of the final line when scrolled to end.
+	-- 0.5 = middle of viewport (default), 1.0 = bottom edge (no extra space)
+	bottom_padding = 0.5,
 }
 
 function M.setup(opts)
 	M.config = vim.tbl_deep_extend("force", M.config, opts or {})
+	M.config.bottom_padding = math.max(0, math.min(1, M.config.bottom_padding))
 	M._mmdr_available = nil -- reset so next check re-probes
 end
 
@@ -83,7 +88,9 @@ local function write_index(dir)
 	if not src then
 		error("Could not locate assets/index.html in runtimepath. Make sure the plugin ships it.")
 	end
-	util.copy_file(src, dst)
+	local content = util.read_text(src)
+	content = content:gsub("__BOTTOM_PADDING__", tostring(M.config.bottom_padding))
+	util.write_text(dst, content)
 	return dst
 end
 
@@ -254,7 +261,7 @@ local function get_content(bufnr)
 		local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
 		text = table.concat(lines, "\n")
 	elseif vim.api.nvim_buf_get_name(bufnr):match("%.mmd$")
-		or vim.api.nvim_buf_get_name(bufnr):match("%.mermaid$") then
+        or vim.api.nvim_buf_get_name(bufnr):match("%.mermaid$") then
 		-- .mmd / .mermaid files: treat entire buffer as mermaid
 		local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
 		text = "```mermaid\n" .. table.concat(lines, "\n") .. "\n```\n"

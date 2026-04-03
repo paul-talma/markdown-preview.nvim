@@ -115,6 +115,10 @@ require("markdown_preview").setup({
   mermaid_renderer = "js",              -- "js" (browser mermaid.js) or "rust" (mmdr CLI, ~400x faster)
 
   scroll_sync = true,                   -- browser follows cursor position
+
+  -- Fraction (0–1): vertical position of the final line when scrolled to end.
+  -- 0.5 = middle of viewport (default), 1.0 = bottom edge (no extra space)
+  bottom_padding = 0.5,
 })
 ```
 
